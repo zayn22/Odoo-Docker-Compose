@@ -1,0 +1,3 @@
+FROM odoo:latest
+
+EXPOSE 8015
