@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  postgresql:
+    container_name: DB-PSQL
+    image: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: 'odoo'
+      POSTGRES_PASSWORD: 'odoo'
+      POSTGRES_DB: 'postgres'
+    volumes:
+      - odoo-db:/var/lib/postgresql/data
+      - ./mnt/c/xc01/docker-file/dump:/home/dump
+    networks:
+      - odoo-networks
+
+  pgadmin:
+    container_name: PG-ADMIN
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'mail@yourmail.com'
+      PGADMIN_DEFAULT_PASSWORD: 'password'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - '5050:80'
+    networks:
+      - odoo-networks
+
+  odoo:
+    container_name: ODOO
+    build:
+        context: ./odoo
+        dockerfile: DockerFile
+    ports:
+      - '8015:8069'
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./odoo/mnt/c/xco01/docker-file/odoo/odoo15/odoo-conf:/etc/odoo
+      - ./odoo/mnt/c/xco01/docker-file/odoo/odoo15/odoo-filestore:/home/filestore
+    environment:
+      HOST: 'DB-PSQL'
+      PORT: '5432'
+      USER: 'odoo'
+      PASSWORD: 'odoo'
+    networks:
+      - odoo-networks
+
+networks:
+  odoo-networks:
+  
+volumes:
+  odoo-data:
+  odoo-db:
+  pgadmin:
